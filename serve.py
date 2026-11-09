@@ -18,9 +18,34 @@ def server_options(environ=None):
     return {'host':host,'port':port,'threads':threads}
 
 
+def bootstrap_admin(app, environ=None):
+    """Create the first administrator from private hosting configuration only."""
+    environ = os.environ if environ is None else environ
+    username = environ.get('ADMIN_USERNAME', '')
+    password = environ.get('ADMIN_PASSWORD', '')
+    if not username and not password:
+        return
+    from services.db import transaction
+    from werkzeug.security import generate_password_hash
+    with app.app_context(), transaction() as db:
+        if db.execute('SELECT 1 FROM admins LIMIT 1').fetchone():
+            return
+        if not username.strip() or len(username) > 100 or not 12 <= len(password) <= 1024:
+            raise ValueError('Set ADMIN_USERNAME (1–100 characters) and ADMIN_PASSWORD (12–1024 characters) in the hosting environment.')
+        uid = db.execute(
+            'INSERT INTO admins(username,password_hash) VALUES(?,?)',
+            (username.strip(), generate_password_hash(password)),
+        ).lastrowid
+        db.execute(
+            'INSERT INTO audit(admin_id,action,detail) VALUES(?,?,?)',
+            (uid, 'create_admin', 'Hosting environment setup'),
+        )
+
+
 def main():
     from app import app
     from waitress import serve
+    bootstrap_admin(app)
     serve(app,**server_options(),max_request_body_size=app.config['MAX_CONTENT_LENGTH'])
 
 

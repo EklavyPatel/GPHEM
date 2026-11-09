@@ -45,6 +45,18 @@ Waitress is the production entry point, behind your host's HTTPS termination/rev
 
 ## First administrator
 
+On hosts without interactive Shell access, configure `ADMIN_USERNAME` and
+`ADMIN_PASSWORD` privately in the hosting dashboard, then use `python serve.py`
+as the start command and redeploy. The password must have 12–1024 characters;
+the username must be nonempty and at most 100 characters. Startup creates the
+first administrator only when no administrator exists, stores a password hash,
+and does not change existing accounts. Never commit these values to GitHub.
+This also means a fresh disposable database creates a new administrator from
+those settings; it does not restore lost exam data. Render Free does not provide
+persistent SQLite storage. Use persistent storage for real examination data.
+
+Alternatively, use interactive creation on hosts offering Shell access:
+
 Open a shell/SSH session on the host using the **same persistent database environment** as the web process:
 
 ```bash
