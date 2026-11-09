@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Find your examination seat{% endblock %}
+{% block content %}
+<div class="notice testing-notice" role="status">The exam management system is currently under testing. Please verify your seating arrangement on the institute notice board.</div>
+<section class="student-intro"><span class="eyebrow">ONE LESS THING TO WORRY ABOUT</span><h1>Your exam. Your seat.<br><span>Ready when you are.</span></h1><p>Find your examination classroom and seat in a moment.</p></section>
+<section class="search-card" aria-labelledby="search-heading"><div class="section-icon">⌕</div><h2 id="search-heading">Find your seat</h2><p>Use your full student ID or roll number.</p>
+{% if error %}<div class="notice error" role="alert">{{ error }}</div>{% endif %}
+{% if exams %}
+<form method="post" class="stack-form" data-loading="Finding your seat…">{{ csrf() }}
+<label for="exam_id">Examination</label><select id="exam_id" name="exam_id" required>
+{% for exam in exams %}<option value="{{ exam.id }}" {{ 'selected' if request.form.get('exam_id')==exam.id|string }}>{{ exam.public.title }} — {{ exam.public.starts_at|localtime(exam.public.timezone) }} ({{ exam.public.timezone }}){% if exam.public.mode|default('')=='gtu' %} · {{ exam.public.shift|title }}{% endif %}</option>{% endfor %}</select>
+<label for="sid">SID / Enrollment / Roll number</label><input id="sid" name="sid" type="text" placeholder="e.g. 001 or ICT-001" maxlength="100" value="{{ request.form.get('sid','') }}" required autocomplete="off" spellcheck="false" autocapitalize="off"><small class="form-hint">Include any leading zeros. Your ID is case-sensitive.</small>
+<button class="button primary full" type="submit">Find my seat <span aria-hidden="true">→</span></button>
+</form>
+{% else %}<div class="empty-state compact"><span>◷</span><h3>Seating will be available soon</h3><p>There are no published examinations at the moment. Please check again after your college announces the release.</p></div>{% endif %}
+<div class="privacy-note"><span aria-hidden="true">♧</span> Only your individual seat information is displayed.</div></section>
+<p class="best-of-luck">BEST OF LUCK</p>
+<div class="student-steps"><span><b>01</b> Select examination</span><span><b>02</b> Enter your SID</span><span><b>03</b> Know where to go</span></div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "ICT-column",
+      "type": "allow",
+      "scope": {
+        "column": 1
+      },
+      "values": [
+        "ICT"
+      ]
+    },
+    {
+      "id": "ECE-column",
+      "type": "allow",
+      "scope": {
+        "column": 2
+      },
+      "values": [
+        "ECE"
+      ]
+    },
+    {
+      "id": "DASI-column",
+      "type": "allow",
+      "scope": {
+        "column": 3
+      },
+      "values": [
+        "DASI"
+      ]
+    }
+  ]
+}

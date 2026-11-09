@@ -1,0 +1,37 @@
+{
+  "room_capacity": 30,
+  "max_blocks_per_room": 4,
+  "floors": [
+    {
+      "order": 1,
+      "name": "Ground Floor",
+      "rooms": [
+        "721",
+        "722",
+        "723",
+        "724",
+        "725"
+      ]
+    },
+    {
+      "order": 2,
+      "name": "First Floor",
+      "rooms": [
+        "731",
+        "732",
+        "733",
+        "734"
+      ]
+    },
+    {
+      "order": 3,
+      "name": "Second Floor",
+      "rooms": [
+        "761",
+        "762",
+        "764",
+        "765"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "separate-batches",
+      "type": "distinct_neighbors",
+      "axis": "bench",
+      "field": "batch"
+    }
+  ]
+}

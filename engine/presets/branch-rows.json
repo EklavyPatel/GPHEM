@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "single-branch-row",
+      "type": "uniform",
+      "axis": "row"
+    }
+  ]
+}

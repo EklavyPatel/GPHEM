@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "uniform-rows",
+      "type": "uniform",
+      "axis": "row"
+    },
+    {
+      "id": "different-neighbors",
+      "type": "distinct_neighbors",
+      "axis": "row"
+    }
+  ]
+}

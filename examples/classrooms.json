@@ -1,0 +1,4 @@
+[
+  {"building":"Main Building","number":"A101","layout":{"rows":5,"columns":3,"seats_per_bench":1,"seats":{"5/1/1":"reserved","5/2/1":"accessible","5/3/1":"blocked"}}},
+  {"building":"Science Block","number":"S201","layout":{"rows":8,"columns":5,"seats_per_bench":2,"seats":{"1/1/1":"accessible","1/1/2":"accessible","8/5/1":"blocked","8/5/2":"blocked"}}}
+]

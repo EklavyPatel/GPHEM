@@ -1,0 +1,6 @@
+Flask>=3.1,<4
+openpyxl>=3.1.5,<4
+pydantic>=2.10,<3
+scipy>=1.13,<2
+waitress>=3,<4
+defusedxml>=0.7.1,<1

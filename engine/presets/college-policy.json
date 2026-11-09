@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "ict-room",
+      "type": "allow",
+      "scope": {
+        "room": "A101"
+      },
+      "values": [
+        "ICT",
+        "ECE",
+        "DASI"
+      ]
+    },
+    {
+      "id": "ict-cap",
+      "type": "quota",
+      "scope": {
+        "room": "A101"
+      },
+      "value": "ICT",
+      "maximum": 4
+    }
+  ]
+}

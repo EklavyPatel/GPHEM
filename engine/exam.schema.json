@@ -1,0 +1,569 @@
+{
+  "$defs": {
+    "Allow": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "layer": {
+          "default": "exam",
+          "enum": [
+            "exam",
+            "session"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        },
+        "type": {
+          "const": "allow",
+          "title": "Type",
+          "type": "string"
+        },
+        "field": {
+          "default": "branch",
+          "enum": [
+            "branch",
+            "batch",
+            "sid"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "values"
+      ],
+      "title": "Allow",
+      "type": "object"
+    },
+    "Block": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "layer": {
+          "default": "exam",
+          "enum": [
+            "exam",
+            "session"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        },
+        "type": {
+          "const": "blocked",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type"
+      ],
+      "title": "Block",
+      "type": "object"
+    },
+    "Cycle": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "layer": {
+          "default": "exam",
+          "enum": [
+            "exam",
+            "session"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        },
+        "type": {
+          "const": "cycle",
+          "title": "Type",
+          "type": "string"
+        },
+        "field": {
+          "default": "branch",
+          "enum": [
+            "branch",
+            "batch"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "axis": {
+          "enum": [
+            "row",
+            "column",
+            "position"
+          ],
+          "title": "Axis",
+          "type": "string"
+        },
+        "values": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "axis",
+        "values"
+      ],
+      "title": "Cycle",
+      "type": "object"
+    },
+    "Group": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "layer": {
+          "default": "exam",
+          "enum": [
+            "exam",
+            "session"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        },
+        "type": {
+          "enum": [
+            "uniform",
+            "distinct_neighbors"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "field": {
+          "default": "branch",
+          "enum": [
+            "branch",
+            "batch"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "axis": {
+          "enum": [
+            "row",
+            "column",
+            "bench"
+          ],
+          "title": "Axis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "axis"
+      ],
+      "title": "Group",
+      "type": "object"
+    },
+    "Order": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "layer": {
+          "default": "exam",
+          "enum": [
+            "exam",
+            "session"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        },
+        "type": {
+          "const": "order",
+          "title": "Type",
+          "type": "string"
+        },
+        "priority": {
+          "default": 0,
+          "title": "Priority",
+          "type": "integer"
+        },
+        "mode": {
+          "enum": [
+            "ascending_sid",
+            "descending_sid",
+            "random",
+            "low_high",
+            "round_robin",
+            "explicit",
+            "suffix"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "traversal": {
+          "default": "row",
+          "enum": [
+            "column",
+            "row"
+          ],
+          "title": "Traversal",
+          "type": "string"
+        },
+        "group_by": {
+          "default": "all",
+          "enum": [
+            "all",
+            "branch",
+            "batch"
+          ],
+          "title": "Group By",
+          "type": "string"
+        },
+        "sids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Sids",
+          "type": "array"
+        },
+        "suffixes": {
+          "items": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "title": "Suffixes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "mode"
+      ],
+      "title": "Order",
+      "type": "object"
+    },
+    "Quota": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "layer": {
+          "default": "exam",
+          "enum": [
+            "exam",
+            "session"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "scope": {
+          "$ref": "#/$defs/Scope"
+        },
+        "type": {
+          "const": "quota",
+          "title": "Type",
+          "type": "string"
+        },
+        "field": {
+          "default": "branch",
+          "enum": [
+            "branch",
+            "batch"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "value": {
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        },
+        "minimum": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Minimum",
+          "type": "integer"
+        },
+        "maximum": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "value"
+      ],
+      "title": "Quota",
+      "type": "object"
+    },
+    "Room": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "rows": {
+          "minimum": 1,
+          "title": "Rows",
+          "type": "integer"
+        },
+        "columns": {
+          "minimum": 1,
+          "title": "Columns",
+          "type": "integer"
+        },
+        "seats_per_bench": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Seats Per Bench",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "rows",
+        "columns"
+      ],
+      "title": "Room",
+      "type": "object"
+    },
+    "Scope": {
+      "additionalProperties": false,
+      "properties": {
+        "room": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Room"
+        },
+        "row": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Row"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Column"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Position"
+        }
+      },
+      "title": "Scope",
+      "type": "object"
+    },
+    "Student": {
+      "additionalProperties": false,
+      "properties": {
+        "sid": {
+          "minLength": 1,
+          "title": "Sid",
+          "type": "string"
+        },
+        "branch": {
+          "minLength": 1,
+          "title": "Branch",
+          "type": "string"
+        },
+        "batch": {
+          "minLength": 1,
+          "title": "Batch",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sid",
+        "branch",
+        "batch"
+      ],
+      "title": "Student",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": 1,
+      "title": "Version",
+      "type": "integer"
+    },
+    "rules": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "allow": "#/$defs/Allow",
+            "blocked": "#/$defs/Block",
+            "cycle": "#/$defs/Cycle",
+            "distinct_neighbors": "#/$defs/Group",
+            "order": "#/$defs/Order",
+            "quota": "#/$defs/Quota",
+            "uniform": "#/$defs/Group"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/Allow"
+          },
+          {
+            "$ref": "#/$defs/Cycle"
+          },
+          {
+            "$ref": "#/$defs/Quota"
+          },
+          {
+            "$ref": "#/$defs/Group"
+          },
+          {
+            "$ref": "#/$defs/Block"
+          },
+          {
+            "$ref": "#/$defs/Order"
+          }
+        ]
+      },
+      "title": "Rules",
+      "type": "array"
+    },
+    "rooms": {
+      "items": {
+        "$ref": "#/$defs/Room"
+      },
+      "minItems": 1,
+      "title": "Rooms",
+      "type": "array"
+    },
+    "students": {
+      "items": {
+        "$ref": "#/$defs/Student"
+      },
+      "title": "Students",
+      "type": "array"
+    },
+    "seed": {
+      "default": 42,
+      "title": "Seed",
+      "type": "integer"
+    },
+    "pins": {
+      "additionalProperties": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Pins",
+      "type": "object"
+    },
+    "locks": {
+      "items": {
+        "$ref": "#/$defs/Scope"
+      },
+      "title": "Locks",
+      "type": "array"
+    }
+  },
+  "required": [
+    "version",
+    "rules",
+    "rooms",
+    "students"
+  ],
+  "title": "Exam",
+  "type": "object"
+}

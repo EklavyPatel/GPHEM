@@ -1,0 +1,318 @@
+{
+  "version": 1,
+  "method": "verified_greedy",
+  "seed": 42,
+  "positions": [
+    {
+      "seat_id": "A101/1/1/1",
+      "room": "A101",
+      "row": 1,
+      "column": 1,
+      "bench": "1/1",
+      "seat_position": 1,
+      "sid": "ICT-001",
+      "branch": "ICT",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "ICT-column",
+        "ICT-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/1/2/1",
+      "room": "A101",
+      "row": 1,
+      "column": 2,
+      "bench": "1/2",
+      "seat_position": 1,
+      "sid": "ECE-021",
+      "branch": "ECE",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "ECE-column",
+        "ECE-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/1/3/1",
+      "room": "A101",
+      "row": 1,
+      "column": 3,
+      "bench": "1/3",
+      "seat_position": 1,
+      "sid": "DASI-011",
+      "branch": "DASI",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "DASI-column",
+        "DASI-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/2/1/1",
+      "room": "A101",
+      "row": 2,
+      "column": 1,
+      "bench": "2/1",
+      "seat_position": 1,
+      "sid": "ICT-013",
+      "branch": "ICT",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "ICT-column",
+        "ICT-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/2/2/1",
+      "room": "A101",
+      "row": 2,
+      "column": 2,
+      "bench": "2/2",
+      "seat_position": 1,
+      "sid": "ECE-003",
+      "branch": "ECE",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "ECE-column",
+        "ECE-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/2/3/1",
+      "room": "A101",
+      "row": 2,
+      "column": 3,
+      "bench": "2/3",
+      "seat_position": 1,
+      "sid": "DASI-025",
+      "branch": "DASI",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "DASI-column",
+        "DASI-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/3/1/1",
+      "room": "A101",
+      "row": 3,
+      "column": 1,
+      "bench": "3/1",
+      "seat_position": 1,
+      "sid": "ICT-003",
+      "branch": "ICT",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "ICT-column",
+        "ICT-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/3/2/1",
+      "room": "A101",
+      "row": 3,
+      "column": 2,
+      "bench": "3/2",
+      "seat_position": 1,
+      "sid": "ECE-015",
+      "branch": "ECE",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "ECE-column",
+        "ECE-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/3/3/1",
+      "room": "A101",
+      "row": 3,
+      "column": 3,
+      "bench": "3/3",
+      "seat_position": 1,
+      "sid": "DASI-004",
+      "branch": "DASI",
+      "batch": "B1",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "DASI-column",
+        "DASI-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/4/1/1",
+      "room": "A101",
+      "row": 4,
+      "column": 1,
+      "bench": "4/1",
+      "seat_position": 1,
+      "sid": "ICT-025",
+      "branch": "ICT",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "ICT-column",
+        "ICT-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/4/2/1",
+      "room": "A101",
+      "row": 4,
+      "column": 2,
+      "bench": "4/2",
+      "seat_position": 1,
+      "sid": "ECE-009",
+      "branch": "ECE",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "ECE-column",
+        "ECE-sequence"
+      ],
+      "superseded_orders": []
+    },
+    {
+      "seat_id": "A101/4/3/1",
+      "room": "A101",
+      "row": 4,
+      "column": 3,
+      "bench": "4/3",
+      "seat_position": 1,
+      "sid": "DASI-017",
+      "branch": "DASI",
+      "batch": "B2",
+      "locked": false,
+      "blocked": false,
+      "applied_rules": [
+        "DASI-column",
+        "DASI-sequence"
+      ],
+      "superseded_orders": []
+    }
+  ],
+  "rules": {
+    "ICT-column": {
+      "id": "ICT-column",
+      "layer": "exam",
+      "scope": {
+        "column": 1
+      },
+      "type": "allow",
+      "field": "branch",
+      "values": [
+        "ICT"
+      ]
+    },
+    "ECE-column": {
+      "id": "ECE-column",
+      "layer": "exam",
+      "scope": {
+        "column": 2
+      },
+      "type": "allow",
+      "field": "branch",
+      "values": [
+        "ECE"
+      ]
+    },
+    "DASI-column": {
+      "id": "DASI-column",
+      "layer": "exam",
+      "scope": {
+        "column": 3
+      },
+      "type": "allow",
+      "field": "branch",
+      "values": [
+        "DASI"
+      ]
+    },
+    "ICT-sequence": {
+      "id": "ICT-sequence",
+      "layer": "exam",
+      "scope": {
+        "column": 1
+      },
+      "type": "order",
+      "priority": 0,
+      "mode": "explicit",
+      "traversal": "row",
+      "group_by": "all",
+      "sids": [
+        "ICT-001",
+        "ICT-013",
+        "ICT-003",
+        "ICT-025"
+      ],
+      "suffixes": []
+    },
+    "ECE-sequence": {
+      "id": "ECE-sequence",
+      "layer": "exam",
+      "scope": {
+        "column": 2
+      },
+      "type": "order",
+      "priority": 0,
+      "mode": "explicit",
+      "traversal": "row",
+      "group_by": "all",
+      "sids": [
+        "ECE-021",
+        "ECE-003",
+        "ECE-015",
+        "ECE-009"
+      ],
+      "suffixes": []
+    },
+    "DASI-sequence": {
+      "id": "DASI-sequence",
+      "layer": "exam",
+      "scope": {
+        "column": 3
+      },
+      "type": "order",
+      "priority": 0,
+      "mode": "explicit",
+      "traversal": "row",
+      "group_by": "all",
+      "sids": [
+        "DASI-011",
+        "DASI-025",
+        "DASI-004",
+        "DASI-017"
+      ],
+      "suffixes": []
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "sequential",
+      "type": "order",
+      "mode": "ascending_sid"
+    }
+  ]
+}

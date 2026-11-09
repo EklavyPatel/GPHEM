@@ -1,0 +1,4 @@
+{% extends 'base.html' %}{% block title %}Administrator login{% endblock %}
+{% block content %}<section class="login-card card"><span class="eyebrow">ADMINISTRATION</span><h1>Welcome back.</h1><p>Sign in to manage examination seating.</p>
+{% if not ready %}<div class="notice">First-run setup is required. On this computer, run <code>flask --app app create-admin</code> to securely create your administrator account.</div>{% endif %}
+<form method="post" class="stack-form" data-loading="Signing in…">{{ csrf() }}<label for="username">Username</label><input id="username" name="username" autocomplete="username" maxlength="100" required><label for="password">Password</label><input id="password" name="password" type="password" autocomplete="current-password" maxlength="1024" required><button class="button primary full">Sign in <span>→</span></button></form><p class="form-hint">Account recovery is available through the local administrator CLI.</p></section>{% endblock %}

@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "seed": 42,
+  "rooms": [
+    {
+      "id": "A101",
+      "rows": 4,
+      "columns": 3
+    }
+  ],
+  "students": [
+    {
+      "sid": "ICT-001",
+      "branch": "ICT",
+      "batch": "B2"
+    },
+    {
+      "sid": "ICT-013",
+      "branch": "ICT",
+      "batch": "B2"
+    },
+    {
+      "sid": "ICT-003",
+      "branch": "ICT",
+      "batch": "B2"
+    },
+    {
+      "sid": "ICT-025",
+      "branch": "ICT",
+      "batch": "B2"
+    },
+    {
+      "sid": "ECE-021",
+      "branch": "ECE",
+      "batch": "B2"
+    },
+    {
+      "sid": "ECE-003",
+      "branch": "ECE",
+      "batch": "B2"
+    },
+    {
+      "sid": "ECE-015",
+      "branch": "ECE",
+      "batch": "B2"
+    },
+    {
+      "sid": "ECE-009",
+      "branch": "ECE",
+      "batch": "B2"
+    },
+    {
+      "sid": "DASI-011",
+      "branch": "DASI",
+      "batch": "B2"
+    },
+    {
+      "sid": "DASI-025",
+      "branch": "DASI",
+      "batch": "B2"
+    },
+    {
+      "sid": "DASI-004",
+      "branch": "DASI",
+      "batch": "B1"
+    },
+    {
+      "sid": "DASI-017",
+      "branch": "DASI",
+      "batch": "B2"
+    }
+  ],
+  "rules": [
+    {
+      "id": "ICT-column",
+      "type": "allow",
+      "scope": {
+        "column": 1
+      },
+      "values": [
+        "ICT"
+      ]
+    },
+    {
+      "id": "ECE-column",
+      "type": "allow",
+      "scope": {
+        "column": 2
+      },
+      "values": [
+        "ECE"
+      ]
+    },
+    {
+      "id": "DASI-column",
+      "type": "allow",
+      "scope": {
+        "column": 3
+      },
+      "values": [
+        "DASI"
+      ]
+    },
+    {
+      "id": "ICT-sequence",
+      "type": "order",
+      "scope": {
+        "column": 1
+      },
+      "mode": "explicit",
+      "sids": [
+        "ICT-001",
+        "ICT-013",
+        "ICT-003",
+        "ICT-025"
+      ]
+    },
+    {
+      "id": "ECE-sequence",
+      "type": "order",
+      "scope": {
+        "column": 2
+      },
+      "mode": "explicit",
+      "sids": [
+        "ECE-021",
+        "ECE-003",
+        "ECE-015",
+        "ECE-009"
+      ]
+    },
+    {
+      "id": "DASI-sequence",
+      "type": "order",
+      "scope": {
+        "column": 3
+      },
+      "mode": "explicit",
+      "sids": [
+        "DASI-011",
+        "DASI-025",
+        "DASI-004",
+        "DASI-017"
+      ]
+    }
+  ]
+}

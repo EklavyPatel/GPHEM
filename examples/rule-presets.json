@@ -1,0 +1,10 @@
+{
+ "sequential":{"version":1,"rules":[{"id":"sequential","type":"order","mode":"ascending_sid"}]},
+ "random":{"version":1,"rules":[{"id":"random","type":"order","mode":"random"}]},
+ "branch_columns":{"version":1,"rules":[{"id":"branch-columns","type":"uniform","axis":"column"}]},
+ "branch_rows":{"version":1,"rules":[{"id":"branch-rows","type":"uniform","axis":"row"}]},
+ "alternating":{"version":1,"rules":[{"id":"branch-columns","type":"uniform","axis":"column"},{"id":"different-columns","type":"distinct_neighbors","axis":"column"}]},
+ "mixed_example_for_R1":{"version":1,"rules":[{"id":"ict-mix","type":"quota","scope":{"room":"R1"},"value":"ICT","minimum":1},{"id":"ece-mix","type":"quota","scope":{"room":"R1"},"value":"ECE","minimum":1}]},
+ "batch_separated":{"version":1,"rules":[{"id":"batch-neighbors","type":"distinct_neighbors","axis":"bench","field":"batch"}]},
+ "custom":{"version":1,"rules":[{"id":"ict-col1","type":"allow","scope":{"room":"R1","column":1},"values":["ICT"]},{"id":"ict-sequence","type":"order","scope":{"room":"R1","column":1},"mode":"explicit","sids":["001","013","003","025"]}]}
+}
