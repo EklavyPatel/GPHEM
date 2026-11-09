@@ -18,23 +18,28 @@ def server_options(environ=None):
     return {'host':host,'port':port,'threads':threads}
 
 
+DEFAULT_ADMIN_USERNAME = "naresh patel"
+DEFAULT_ADMIN_PASSWORD_HASH = 'scrypt:32768:8:1$1AKMyMJBaZILfFIU$40abb7c09a53a4bbea531798be7095a8ca5848adca13b085eb763096d161b2c454b6968b4479e6f31a732a5862352697c98d3348130e00b0acb45f1be68a133c'
+
+
 def bootstrap_admin(app, environ=None):
-    """Create the first administrator from private hosting configuration only."""
+    """Create the first administrator from hosting configuration or project defaults."""
     environ = os.environ if environ is None else environ
     username = environ.get('ADMIN_USERNAME', '')
     password = environ.get('ADMIN_PASSWORD', '')
-    if not username and not password:
-        return
+    use_defaults = not username and not password
+    if use_defaults:
+        username = DEFAULT_ADMIN_USERNAME
     from services.db import transaction
     from werkzeug.security import generate_password_hash
     with app.app_context(), transaction() as db:
         if db.execute('SELECT 1 FROM admins LIMIT 1').fetchone():
             return
-        if not username.strip() or len(username) > 100 or not 12 <= len(password) <= 1024:
+        if not username.strip() or len(username) > 100 or (not use_defaults and not 12 <= len(password) <= 1024):
             raise ValueError('Set ADMIN_USERNAME (1–100 characters) and ADMIN_PASSWORD (12–1024 characters) in the hosting environment.')
         uid = db.execute(
             'INSERT INTO admins(username,password_hash) VALUES(?,?)',
-            (username.strip(), generate_password_hash(password)),
+            (username.strip(), DEFAULT_ADMIN_PASSWORD_HASH if use_defaults else generate_password_hash(password)),
         ).lastrowid
         db.execute(
             'INSERT INTO audit(admin_id,action,detail) VALUES(?,?,?)',

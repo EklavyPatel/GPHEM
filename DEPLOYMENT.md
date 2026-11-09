@@ -45,6 +45,13 @@ Waitress is the production entry point, behind your host's HTTPS termination/rev
 
 ## First administrator
 
+When both `ADMIN_USERNAME` and `ADMIN_PASSWORD` are absent, `python serve.py`
+creates the first administrator using the repository's demo username
+`naresh patel` and bundled password hash. These shared defaults are for testing;
+use private hosting credentials before entering real exam data. Existing
+administrators are never overwritten. Partial environment configuration is
+rejected rather than mixed with defaults.
+
 On hosts without interactive Shell access, configure `ADMIN_USERNAME` and
 `ADMIN_PASSWORD` privately in the hosting dashboard, then use `python serve.py`
 as the start command and redeploy. The password must have 12–1024 characters;
@@ -63,7 +70,7 @@ Open a shell/SSH session on the host using the **same persistent database enviro
 flask --app app create-admin
 ```
 
-Enter your username and a unique password when prompted. There are no default production credentials. Do not put the password in a GitHub file, public build log or command-line argument. Choose hosting with an authenticated shell/one-off interactive process for this step. Password recovery is `flask --app app reset-password`; it revokes browser sessions.
+Enter your username and a unique password when prompted. The startup defaults are shared demo credentials; set private hosting credentials for production. Do not put the password in a GitHub file, public build log or command-line argument. Choose hosting with an authenticated shell/one-off interactive process for this step. Password recovery is `flask --app app reset-password`; it revokes browser sessions.
 
 A fresh deployment starts with an empty database. Import the required college data through the private administrator UI. To migrate an existing installation, use an authenticated private transfer of a consistent SQLite backup while the destination server is stopped; **never upload that backup to the repository**. See README's backup/restore instructions.
 
