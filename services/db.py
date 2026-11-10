@@ -1,4 +1,4 @@
-"""SQLite persistence. Every state transition uses an explicit write transaction."""
+"""SQLite legacy/local and PostgreSQL persistence. Every state transition uses an explicit write transaction."""
 import sqlite3
 import os
 from pathlib import Path
@@ -87,9 +87,24 @@ def connect(path):
     return db
 
 
+def connect_app(app):
+    pool = app.extensions.get('postgres_pool')
+    if pool is not None:
+        from .postgres import Connection
+        return Connection(pool.getconn(), pool)
+    return connect(app.config['DATABASE'])
+
+
+try:
+    from psycopg import IntegrityError as PostgreSQLIntegrityError
+except ImportError:  # SQLite-only local installations can still read legacy data.
+    PostgreSQLIntegrityError = sqlite3.IntegrityError
+INTEGRITY_ERRORS = tuple(set((sqlite3.IntegrityError, PostgreSQLIntegrityError)))
+
+
 def get_db():
     if 'db' not in g:
-        g.db = connect(current_app.config['DATABASE'])
+        g.db = connect_app(current_app)
     return g.db
 
 
@@ -109,7 +124,16 @@ def transaction(db=None):
         else:
             db.execute(f'RELEASE {name}')
         return
-    db.execute('BEGIN IMMEDIATE')
+    if getattr(db, 'dialect', None) == 'postgresql':
+        from .postgres import LOCK_ID, WRITE_LOCK_SQL
+        db.execute('BEGIN')
+        try:
+            db.execute(WRITE_LOCK_SQL, (LOCK_ID,))
+        except BaseException:
+            db.rollback()
+            raise
+    else:
+        db.execute('BEGIN IMMEDIATE')
     try:
         yield db
     except BaseException:
@@ -121,6 +145,10 @@ def transaction(db=None):
 
 def init_db(app):
     """Upgrade v1 in place with a consistent backup; never rewrite saved revisions."""
+    if str(app.config['DATABASE']).startswith(('postgresql://', 'postgres://')):
+        from .postgres import initialize
+        initialize(app)
+        return
     import json
     import tempfile
     from .gtu_engine import DEFAULT_CONFIG
@@ -174,7 +202,7 @@ def init_db(app):
                 except (ValueError,TypeError):
                     continue  # A corrupt date fails closed: NULL is never published.
                 db.execute('UPDATE revisions SET release_at=? WHERE id=?',(when,r['id']))
-            db.execute('INSERT OR IGNORE INTO gtu_settings(id,config) VALUES(1,?)', (json.dumps(DEFAULT_CONFIG),))
+            db.execute('INSERT INTO gtu_settings(id,config) VALUES(1,?) ON CONFLICT(id) DO NOTHING', (json.dumps(DEFAULT_CONFIG),))
             if backup_name:
                 db.execute("INSERT INTO audit(action,detail) VALUES('schema_migration',?)",
                            (f'v{version} to v5; backup: '+Path(backup_name).name,))

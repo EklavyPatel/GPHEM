@@ -18,28 +18,25 @@ def server_options(environ=None):
     return {'host':host,'port':port,'threads':threads}
 
 
-DEFAULT_ADMIN_USERNAME = "naresh patel"
-DEFAULT_ADMIN_PASSWORD_HASH = 'scrypt:32768:8:1$1AKMyMJBaZILfFIU$40abb7c09a53a4bbea531798be7095a8ca5848adca13b085eb763096d161b2c454b6968b4479e6f31a732a5862352697c98d3348130e00b0acb45f1be68a133c'
-
-
 def bootstrap_admin(app, environ=None):
-    """Create the first administrator from hosting configuration or project defaults."""
+    """Create the first administrator once, from private runtime configuration.
+
+    The database transaction serializes competing starts. Existing accounts are
+    authoritative: environment changes never rename/reset an administrator.
+    """
     environ = os.environ if environ is None else environ
     username = environ.get('ADMIN_USERNAME', '')
     password = environ.get('ADMIN_PASSWORD', '')
-    use_defaults = not username and not password
-    if use_defaults:
-        username = DEFAULT_ADMIN_USERNAME
     from services.db import transaction
     from werkzeug.security import generate_password_hash
     with app.app_context(), transaction() as db:
         if db.execute('SELECT 1 FROM admins LIMIT 1').fetchone():
             return
-        if not username.strip() or len(username) > 100 or (not use_defaults and not 12 <= len(password) <= 1024):
+        if not username or username != username.strip() or len(username) > 100 or any(ord(c) < 32 for c in username) or not 12 <= len(password) <= 1024:
             raise ValueError('Set ADMIN_USERNAME (1–100 characters) and ADMIN_PASSWORD (12–1024 characters) in the hosting environment.')
         uid = db.execute(
             'INSERT INTO admins(username,password_hash) VALUES(?,?)',
-            (username.strip(), DEFAULT_ADMIN_PASSWORD_HASH if use_defaults else generate_password_hash(password)),
+            (username, generate_password_hash(password, method='scrypt')),
         ).lastrowid
         db.execute(
             'INSERT INTO audit(admin_id,action,detail) VALUES(?,?,?)',
@@ -50,8 +47,9 @@ def bootstrap_admin(app, environ=None):
 def main():
     from app import app
     from waitress import serve
+    options = server_options()
     bootstrap_admin(app)
-    serve(app,**server_options(),max_request_body_size=app.config['MAX_CONTENT_LENGTH'])
+    serve(app,**options,max_request_body_size=app.config['MAX_CONTENT_LENGTH'])
 
 
 if __name__=='__main__':

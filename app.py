@@ -15,8 +15,8 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.security import generate_password_hash, check_password_hash
 from pydantic import ValidationError
 from engine import Conflict, Preset, Exam, Plan
-from services.db import get_db, connect, init_db, close_db, transaction, audit
-from services.security import SQLiteSessions, admin_required, csrf_protect, csrf_token, rotate_session, rate_limit
+from services.db import get_db, connect, init_db, close_db, transaction, audit, INTEGRITY_ERRORS, PostgreSQLIntegrityError
+from services.security import DatabaseSessions, admin_required, csrf_protect, csrf_token, rotate_session, rate_limit
 from services.excel_service import FIELDS, parse_students
 from services.room_service import validate_layout, available
 from services.gtu_service import settings_for, roster as gtu_roster, form_settings
@@ -62,19 +62,28 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     Path(app.instance_path).mkdir(mode=0o700, parents=True, exist_ok=True)
     os.chmod(app.instance_path, 0o700)
-    app.config.update(DATABASE=os.environ.get('SEATING_DATABASE',str(Path(app.instance_path)/'seating.sqlite')),
+    app.config.update(DATABASE=os.environ.get('DATABASE_URL') or os.environ.get('SEATING_DATABASE'),
+                      DATABASE_SCHEMA=os.environ.get('DATABASE_SCHEMA','gphem'),
+                      DATABASE_POOL_SIZE=int(os.environ.get('DATABASE_POOL_SIZE','4')),
                       COLLEGE_NAME=os.environ.get('COLLEGE_NAME','GOVERNMENT POLYTECHNIC HIMMATNAGAR'), MAX_CONTENT_LENGTH=6*1024*1024,
                       MAX_FORM_MEMORY_SIZE=512*1024, SESSION_COOKIE_NAME='seating_session',
                       SESSION_COOKIE_SECURE=os.environ.get('COOKIE_SECURE','0')=='1', SESSION_TTL=7200,
                       TRUSTED_HOSTS=os.environ.get('TRUSTED_HOSTS','').split(',') if os.environ.get('TRUSTED_HOSTS') else None)
     if test_config:
         app.config.update(test_config)
-    database_path=Path(app.config['DATABASE']).expanduser().resolve()
-    database_path.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
-    app.config['DATABASE']=str(database_path)
+    if not app.config['DATABASE']:
+        raise RuntimeError('Set DATABASE_URL for PostgreSQL or explicit SEATING_DATABASE for legacy SQLite.')
+    is_postgres = str(app.config['DATABASE']).startswith(('postgresql://', 'postgres://'))
+    if not is_postgres:
+        if os.environ.get('DATABASE_URL') and not (test_config and 'DATABASE' in test_config):
+            raise ValueError('DATABASE_URL must be a PostgreSQL connection URL.')
+        database_path=Path(app.config['DATABASE']).expanduser().resolve()
+        database_path.parent.mkdir(mode=0o700,parents=True,exist_ok=True)
+        app.config['DATABASE']=str(database_path)
     init_db(app)
-    os.chmod(app.config['DATABASE'], 0o600)
-    app.session_interface = SQLiteSessions()
+    if not is_postgres:
+        os.chmod(app.config['DATABASE'], 0o600)
+    app.session_interface = DatabaseSessions()
     app.teardown_appcontext(close_db)
     app.before_request(csrf_protect)
 
@@ -113,11 +122,12 @@ def create_app(test_config=None):
 
     @app.errorhandler(ValueError)
     @app.errorhandler(sqlite3.IntegrityError)
+    @app.errorhandler(PostgreSQLIntegrityError)
     def invalid(exc):
         message = str(exc)
         if isinstance(exc, ValidationError):
             message = '; '.join('.'.join(map(str,e['loc']))+': '+e['msg'] for e in exc.errors())
-        if isinstance(exc, sqlite3.IntegrityError):
+        if isinstance(exc, INTEGRITY_ERRORS):
             message = 'This record duplicates an existing identifier or conflicts with saved data. No changes were saved.'
         return render_template('error.html', message=message, hint=getattr(exc,'hint',''), code=422),422
 
@@ -253,7 +263,7 @@ def create_app(test_config=None):
                         raise ValueError('An imported GTU roster belongs to its date, shift and time zone. Create a new session to change these.')
                     db.execute('UPDATE exams SET shift=?,gtu_date=? WHERE id=?',(shift,new_date,exam_id))
                 if request.form.get('publish_at'):
-                    db.execute('INSERT OR REPLACE INTO publication_overrides VALUES(?,?)',(exam_id,publish_at))
+                    db.execute('INSERT INTO publication_overrides VALUES(?,?) ON CONFLICT(exam_id) DO UPDATE SET release_at=excluded.release_at',(exam_id,publish_at))
                     audit('release_time_override',f'exam={exam_id}, release_at={publish_at}')
                 else:
                     db.execute('DELETE FROM publication_overrides WHERE exam_id=?',(exam_id,))
@@ -612,14 +622,18 @@ def create_app(test_config=None):
     @admin_required
     def backup():
         with transaction():
-            audit('backup','Full SQLite snapshot downloaded')
+            audit('backup','Full application snapshot downloaded')
         with tempfile.TemporaryDirectory() as folder:
             path=str(Path(folder)/'backup.sqlite')
-            dest=sqlite3.connect(path)
-            try:
-                get_db().backup(dest)
-            finally:
-                dest.close()
+            if is_postgres:
+                from services.postgres import backup_to_sqlite
+                backup_to_sqlite(get_db(), path)
+            else:
+                dest=sqlite3.connect(path)
+                try:
+                    get_db().backup(dest)
+                finally:
+                    dest.close()
             data=Path(path).read_bytes()
         return send_file(io.BytesIO(data),as_attachment=True,download_name='seating-backup.sqlite',mimetype='application/octet-stream')
 
@@ -635,7 +649,7 @@ def create_app(test_config=None):
                 uid=db.execute('INSERT INTO admins(username,password_hash) VALUES(?,?)',
                                (username.strip(),generate_password_hash(password))).lastrowid
                 db.execute('INSERT INTO audit(admin_id,action,detail) VALUES(?,?,?)',(uid,'create_admin','Local CLI setup'))
-        except sqlite3.IntegrityError:
+        except INTEGRITY_ERRORS:
             raise click.ClickException('That administrator username already exists.') from None
         click.echo('Administrator created. Sign in at /admin/login.')
 

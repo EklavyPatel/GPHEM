@@ -1,18 +1,26 @@
 import json
+import os
+import uuid
 import re
 import pytest
 
 
 @pytest.fixture
-def app(tmp_path):
+def app(tmp_path, request):
     from app import create_app
     from werkzeug.security import generate_password_hash
     from services.db import get_db
-    app=create_app({'TESTING':True,'DATABASE':str(tmp_path/'test.sqlite')})
+    if os.environ.get('GPHEM_TEST_DATABASE_URL'):
+        database, schema = request.getfixturevalue('pg_database')
+        app=create_app({'TESTING':True,'DATABASE':database,'DATABASE_SCHEMA':schema})
+    else:
+        app=create_app({'TESTING':True,'DATABASE':str(tmp_path/'test.sqlite')})
     with app.app_context():
         get_db().execute('INSERT INTO admins(username,password_hash) VALUES(?,?)',
                          ('exam-admin',generate_password_hash('a-test-password-123!')))
-    return app
+    yield app
+    if app.extensions.get('postgres_pool'):
+        app.extensions['postgres_pool'].close()
 
 
 @pytest.fixture
@@ -70,3 +78,23 @@ def release_window(app,eid,seconds=0):
     instant=start-timedelta(hours=24)+timedelta(seconds=seconds)
     app.config['NOW_UTC']=lambda:instant
     return instant
+
+
+@pytest.fixture
+def pg_database():
+    url = os.environ.get('GPHEM_TEST_DATABASE_URL')
+    if not url:
+        pytest.skip('GPHEM_TEST_DATABASE_URL is required for isolated PostgreSQL tests')
+    from services.postgres import direct_connect
+    from scripts.migrate_postgresql import provision
+    schema = 'gphem_test_' + uuid.uuid4().hex
+    db = direct_connect(url, schema)
+    try:
+        provision(db.raw, schema)
+        yield url, schema
+    finally:
+        # Only this fixture's unpredictable, newly created namespace is removed.
+        # No application/production namespace is ever a cleanup target.
+        db.rollback()
+        db.raw.execute('DROP SCHEMA "' + schema + '" CASCADE')
+        db.close()
