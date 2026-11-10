@@ -40,7 +40,12 @@ class DatabaseSessions(SessionInterface):
     def save_session(self, app, sess, response):
         if not sess.modified:
             return
-        db = connect_app(app)
+        # Reuse the request connection. Taking a second pooled connection here
+        # can deadlock when all worker requests already hold their first one.
+        db = g.get('db')
+        owns_connection = db is None
+        if owns_connection:
+            db = connect_app(app)
         try:
             with transaction(db):
                 db.execute('DELETE FROM web_sessions WHERE expires<?', (time.time(),))
@@ -59,7 +64,8 @@ class DatabaseSessions(SessionInterface):
                 else:
                     db.execute('DELETE FROM web_sessions WHERE token_hash=?', (digest(sess.token),))
         finally:
-            db.close()
+            if owns_connection:
+                db.close()
         if sess:
             response.set_cookie(self.get_cookie_name(app), sess.token, httponly=True,
                                 secure=app.config['SESSION_COOKIE_SECURE'], samesite='Lax',

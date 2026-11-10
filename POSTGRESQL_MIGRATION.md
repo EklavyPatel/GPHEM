@@ -28,7 +28,7 @@ mutable state, retaining SQLite's write serialization for cooperating GPHEM
 processes. Nested units use savepoints. Out-of-band SQL writers must observe
 the same lock (`1196443717`); direct database administration is not serialized
 by application code. Session expiry/revocation, CSRF and shared rate limits
-retain the existing behavior. Request/session connections use a bounded pool
+retain the existing behavior. Session saving reuses the request connection to avoid exhausting the pool when all workers are busy. Request/session connections use a bounded pool
 (default four), ten-second connection/checkout timeouts, and thirty-second
 lock timeouts. Prepared statements are disabled for pooler compatibility.
 
@@ -94,7 +94,7 @@ simply restoring an older SQLite file would lose those later changes.
 
 ## Validation
 
-Local legacy regression: 198 tests and 5 subtests passed; seven real PostgreSQL
+Local legacy regression: 198 tests and 5 subtests passed; eight real PostgreSQL
 integration tests skipped because the local driver could not be installed.
 Local DNS cannot resolve GitHub/PyPI, so GitHub MCP is used for commits.
 All 25 templates rendered successfully.
@@ -109,9 +109,9 @@ separate from `gphem`; only identity sequence values there advanced.
 The GitHub Actions PostgreSQL job installs the driver, starts PostgreSQL 17 and
 runs the entire application suite against a new unpredictable test schema for
 each database fixture. It also tests concurrent rate limits, nested rollback,
-generated IDs, portable backup/import roundtrip, exact data preservation,
+generated IDs, saturated connection pools, portable backup/import roundtrip, exact data preservation,
 sequence reset, startup checks and migration refusal on an existing schema.
-Its executed outcome must be checked before declaring PostgreSQL acceptance.
+At commit `a72387942b0f261a5472eb0bdf23c46f6b887867`, the PostgreSQL job passed 208 tests with two skips and five subtests. The two skips require private original PDF fixtures. The driver and pool packages installed successfully in CI. A subsequent pool saturation regression test validates that saving sessions reuses the request connection. See the latest Actions run for the final branch outcome.
 
 Remaining production dependencies: approved production backup; securely
 provisioned PostgreSQL credentials; restricted backend role/policies;

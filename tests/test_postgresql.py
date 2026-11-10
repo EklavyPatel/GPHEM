@@ -123,6 +123,29 @@ def test_rate_limit_is_atomic_under_concurrent_requests(app):
         assert sum(executor.map(attempt, range(8))) == 2
 
 
+def test_sessions_save_when_all_pool_connections_are_in_use(app):
+    if 'postgres_pool' not in app.extensions:
+        pytest.skip('PostgreSQL pool saturation contract')
+    from flask import Response
+    from services.db import get_db
+    from services.security import ServerSession
+    workers = app.config['DATABASE_POOL_SIZE']
+    barrier = threading.Barrier(workers)
+    def save(index):
+        with app.test_request_context('/'):
+            get_db().execute('SELECT 1')
+            barrier.wait(timeout=10)
+            session = ServerSession()
+            session['marker'] = index
+            response = Response()
+            app.session_interface.save_session(app, session, response)
+            assert 'seating_session=' in response.headers['Set-Cookie']
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        list(executor.map(save, range(workers)))
+    with app.app_context():
+        assert get_db().execute('SELECT count(*) FROM web_sessions').fetchone()[0] == workers
+
+
 def test_startup_refuses_unprovisioned_or_wrong_schema(pg_database):
     from app import create_app
     url, schema = pg_database
