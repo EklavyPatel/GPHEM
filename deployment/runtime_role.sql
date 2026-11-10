@@ -1,0 +1,54 @@
+-- Run once as the schema owner in Supabase SQL Editor. No password is embedded.
+-- A pre-existing role aborts this transaction without modifying its permissions.
+BEGIN;
+CREATE ROLE gphem_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS;
+DO $$ BEGIN EXECUTE format('GRANT CONNECT ON DATABASE %I TO gphem_app', current_database()); END $$;
+GRANT USAGE ON SCHEMA "gphem" TO gphem_app;
+GRANT SELECT ON "gphem".schema_migrations TO gphem_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".admins TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".admins FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".web_sessions TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".web_sessions FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".rate_limits TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".rate_limits FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".rooms TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".rooms FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".exams TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".exams FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".exam_rooms TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".exam_rooms FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".students TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".students FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".imports TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".imports FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".revisions TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".revisions FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".assignments TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".assignments FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".presets TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".presets FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".audit TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".audit FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".generation_errors TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".generation_errors FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".gtu_settings TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".gtu_settings FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".gtu_students TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".gtu_students FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".pdf_imports TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".pdf_imports FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".emergency_admissions TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".emergency_admissions FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".pdf_sources TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".pdf_sources FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".exam_pdf_sources TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".exam_pdf_sources FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".publication_overrides TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".publication_overrides FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT SELECT, INSERT, UPDATE, DELETE ON "gphem".emergency_seats TO gphem_app;
+CREATE POLICY gphem_backend ON "gphem".emergency_seats FOR ALL TO gphem_app USING (true) WITH CHECK (true);
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA "gphem" TO gphem_app;
+COMMIT;
+-- Set a DIFFERENT database password privately in Supabase SQL Editor:
+-- ALTER ROLE gphem_app PASSWORD 'YOUR_PRIVATE_DATABASE_PASSWORD';
+-- Do not save a filled-in copy of that command in GitHub or send it in chat.

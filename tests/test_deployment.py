@@ -49,7 +49,7 @@ def test_hosting_bootstrap_creates_hashed_admin_once(tmp_path):
         assert get_db().execute("SELECT count(*) FROM audit WHERE action='create_admin'").fetchone()[0] == 1
 
 
-@pytest.mark.parametrize('settings', [ {'ADMIN_USERNAME': 'Test Admin'}, {'ADMIN_PASSWORD': 'test-only-long-password'}, {'ADMIN_USERNAME': 'Test Admin', 'ADMIN_PASSWORD': 'short'}])
+@pytest.mark.parametrize('settings', [{}, {'ADMIN_USERNAME': 'Test Admin'}, {'ADMIN_PASSWORD': 'test-only-long-password'}, {'ADMIN_USERNAME': 'Test Admin', 'ADMIN_PASSWORD': 'short'}, {'ADMIN_USERNAME': ' spaced ', 'ADMIN_PASSWORD': 'test-only-long-password'}])
 def test_hosting_bootstrap_requires_valid_credentials(tmp_path, settings):
     from app import create_app
     from services.db import get_db
@@ -61,18 +61,30 @@ def test_hosting_bootstrap_requires_valid_credentials(tmp_path, settings):
         assert get_db().execute('SELECT count(*) FROM admins').fetchone()[0] == 0
 
 
-def test_default_admin_is_created_without_hosting_variables_and_preserved(tmp_path):
+def test_existing_admin_is_preserved_when_bootstrap_variables_are_removed(tmp_path):
     from app import create_app
     from services.db import get_db
-    from serve import bootstrap_admin, DEFAULT_ADMIN_PASSWORD_HASH
+    from serve import bootstrap_admin
     application = create_app({'TESTING': True, 'DATABASE': str(tmp_path / 'db.sqlite')})
-    bootstrap_admin(application, {})
+    bootstrap_admin(application, {'ADMIN_USERNAME': 'Private Admin', 'ADMIN_PASSWORD': 'test-only-long-password'})
     with application.app_context():
         row = get_db().execute('SELECT * FROM admins').fetchone()
-        assert row['username'] == 'naresh patel'
-        assert row['password_hash'] == DEFAULT_ADMIN_PASSWORD_HASH
+        assert row['username'] == 'Private Admin'
         get_db().execute("UPDATE admins SET password_hash='changed-hash'")
     bootstrap_admin(application, {})
     with application.app_context():
         assert get_db().execute('SELECT count(*) FROM admins').fetchone()[0] == 1
         assert get_db().execute('SELECT password_hash FROM admins').fetchone()[0] == 'changed-hash'
+
+
+def test_first_start_failure_never_binds_http_server(tmp_path, monkeypatch):
+    from app import create_app
+    application = create_app({'TESTING': True, 'DATABASE': str(tmp_path / 'empty.sqlite')})
+    monkeypatch.setitem(sys.modules, 'app', SimpleNamespace(app=application))
+    calls = []
+    monkeypatch.setitem(sys.modules, 'waitress', SimpleNamespace(serve=lambda *a, **kw: calls.append(True)))
+    monkeypatch.delenv('ADMIN_USERNAME', raising=False)
+    monkeypatch.delenv('ADMIN_PASSWORD', raising=False)
+    with pytest.raises(ValueError, match='ADMIN_USERNAME'):
+        main()
+    assert calls == []

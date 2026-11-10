@@ -1,5 +1,10 @@
 # PostgreSQL migration implementation
 
+Current deployment decision: start fresh in Supabase, with no SQLite data import.
+See [RENDER_FREE_SETUP.md](RENDER_FREE_SETUP.md) for the current no-shell setup,
+private administrator bootstrap and restricted runtime login. Backup/import
+steps below are historical/optional tooling, not prerequisites for this fresh deployment.
+
 Target: Supabase project `gphem` (`utlinkzhwzkkdtfyofuk`), private schema
 `gphem`. Work belongs on `migration/supabase-postgresql`; Render continues
 to deploy `main`. Do not merge, deploy, change Render variables, or import
