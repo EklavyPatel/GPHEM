@@ -92,7 +92,7 @@ def confirm_pdf(exam_id,token):
         db.execute('DELETE FROM students WHERE exam_id=?',(exam_id,))
         for p in data['session']['records']:
             insert_person(exam,{**p,'name':'','branch':p['subject_code'],'batch':p['block_no'],'year':''},data['reason'],data['received'])
-        db.execute('INSERT OR REPLACE INTO exam_pdf_sources VALUES(?,?)',(exam_id,token))
+        db.execute('INSERT INTO exam_pdf_sources VALUES(?,?) ON CONFLICT(exam_id) DO UPDATE SET source_id=excluded.source_id',(exam_id,token))
         rid,moved=create_amended_draft(exam_id,expected(),request.form.get('repack')=='on','revised_pdf')
         db.execute('DELETE FROM pdf_imports WHERE id=?',(token,))
         audit('revised_pdf_authorization',f'exam={exam_id}, reason={data["reason"]}')

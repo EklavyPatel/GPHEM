@@ -18,6 +18,8 @@ def test_database_statements_compile_against_schema():
     db.executescript(schema)
     try:
         for path in [ROOT/'app.py',*(ROOT/'services').glob('*.py'),*(ROOT/'web').glob('*.py'),ROOT/'tests/conftest.py']:
+            if path.name == 'postgres.py':
+                continue  # Driver-specific PostgreSQL statements are exercised in PostgreSQL CI.
             for node in ast.walk(ast.parse(path.read_text())):
                 if not isinstance(node,ast.Call) or not isinstance(node.func,ast.Attribute) or node.func.attr not in ('execute','executemany') or not node.args:
                     continue

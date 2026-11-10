@@ -194,7 +194,8 @@ def test_backup_restores_and_duplicate_assignment_constraint(app,admin,tmp_path)
     db.close()
     with app.app_context():
         db=get_db();row=db.execute('SELECT * FROM assignments LIMIT 1').fetchone()
-        with pytest.raises(sqlite3.IntegrityError):db.execute('INSERT INTO assignments VALUES(?,?,?,?)',tuple(row))
+        from services.db import INTEGRITY_ERRORS
+        with pytest.raises(INTEGRITY_ERRORS):db.execute('INSERT INTO assignments VALUES(?,?,?,?)',tuple(row))
 
 
 def test_first_run_cli_and_no_default_credentials(app):

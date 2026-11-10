@@ -48,7 +48,7 @@ def emergency_record(exam, form):
 
 def authorize(exam_id, sid, reason, received=None):
     db=get_db()
-    db.execute('INSERT OR REPLACE INTO emergency_admissions VALUES(?,?,?,?,?)',
+    db.execute('INSERT INTO emergency_admissions VALUES(?,?,?,?,?) ON CONFLICT(exam_id,sid) DO UPDATE SET reason=excluded.reason,admin_id=excluded.admin_id,created=excluded.created',
                (exam_id,sid,reason,g.admin['id'],received if received is not None else time.time()))
 
 

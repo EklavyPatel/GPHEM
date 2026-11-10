@@ -8,7 +8,7 @@ from functools import wraps
 from flask import abort, g, redirect, request, session, url_for
 from flask.sessions import SessionInterface, SessionMixin
 from werkzeug.datastructures import CallbackDict
-from .db import connect, get_db, transaction
+from .db import connect_app, get_db, transaction
 
 
 def digest(value):
@@ -23,11 +23,11 @@ class ServerSession(CallbackDict, SessionMixin):
         self.is_new = is_new
 
 
-class SQLiteSessions(SessionInterface):
+class DatabaseSessions(SessionInterface):
     def open_session(self, app, req):
         token = req.cookies.get(self.get_cookie_name(app), '')
         if len(token) < 100 and token:
-            db = connect(app.config['DATABASE'])
+            db = connect_app(app)
             try:
                 row = db.execute('SELECT data FROM web_sessions WHERE token_hash=? AND expires>?',
                                  (digest(token), time.time())).fetchone()
@@ -40,7 +40,7 @@ class SQLiteSessions(SessionInterface):
     def save_session(self, app, sess, response):
         if not sess.modified:
             return
-        db = connect(app.config['DATABASE'])
+        db = connect_app(app)
         try:
             with transaction(db):
                 db.execute('DELETE FROM web_sessions WHERE expires<?', (time.time(),))
@@ -111,7 +111,11 @@ def rate_limit(namespace, maximum, seconds, identity=None):
         row = db.execute('SELECT count,resets FROM rate_limits WHERE key=?', (key,)).fetchone()
         allowed = not row or row['count'] < maximum
         if allowed:
-            db.execute('INSERT INTO rate_limits VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=count+1',
+            db.execute('INSERT INTO rate_limits VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET count=rate_limits.count+1',
                        (key, now + seconds))
     if not allowed:
         abort(429, 'Too many attempts. Please wait before trying again.')
+
+
+# Compatibility for existing integrations.
+SQLiteSessions = DatabaseSessions
