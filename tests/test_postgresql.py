@@ -18,6 +18,16 @@ def test_parameters_and_row_contract():
     assert dict(row) == {'sid': '001', 'name': 'Student'}
 
 
+def test_application_sql_compiles_on_postgresql(pg_database):
+    from scripts.check_postgresql_sql import check
+    from services.postgres import direct_connect
+    db = direct_connect(*pg_database)
+    try:
+        assert check(db) >= 131
+    finally:
+        db.close()
+
+
 def test_all_21_tables_and_private_namespace(pg_database):
     from services.postgres import direct_connect, application_tables
     url, schema = pg_database

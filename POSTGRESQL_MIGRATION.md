@@ -94,7 +94,7 @@ simply restoring an older SQLite file would lose those later changes.
 
 ## Validation
 
-Local legacy regression: 198 tests and 5 subtests passed; six real PostgreSQL
+Local legacy regression: 198 tests and 5 subtests passed; seven real PostgreSQL
 integration tests skipped because the local driver could not be installed.
 Local DNS cannot resolve GitHub/PyPI, so GitHub MCP is used for commits.
 All 25 templates rendered successfully.
